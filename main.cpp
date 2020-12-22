@@ -3,7 +3,7 @@
 
 size_t SIZE = 5;
 size_t n = SIZE - 1;
-size_t noOfIteration = 4;
+size_t noOfIteration = 1;
 
 
 int main() {
@@ -25,16 +25,23 @@ int main() {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
 
-            if (i <= 0 || i >= n - 1 || j <= 0 || j >= n - 1) {
-                continue;
-            }
-            A[i][j] = 0.2 * (
-                    A[i][j] +
-                    A[i - 1][j] +
-                    A[i + 1][j] +
-                    A[i][j - 1] +
-                    A[i][j + 1]
-            );
+                int second = 0;
+                if (i - 1 >= 0) A[i - 1][j];
+                int third = 0;
+                if (i + 1 < n) A[i + 1][j];
+                int fourth = 0;
+                if (j - 1 >= 0) A[i][j - 1];
+                int fifth = 0;
+                if (j + 1 < n) A[i][j + 1];
+
+                A[i][j] = 0.2 * (
+                        A[i][j] +
+                        second +
+                        third +
+                        fourth +
+                        fifth
+
+                );
             }
         }
     }
