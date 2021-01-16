@@ -62,6 +62,7 @@ int main() {
 
 
     // displaying matrix in serial version
+    std::cout<<"Serial version: \n";
     std::cout << std::setprecision(precision) << std::fixed;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -76,13 +77,14 @@ int main() {
 
 
     // displaying matrix in parallel version
-//    std::cout << std::setprecision(precision) << std::fixed;
-//    for (int i = 0; i < n; i++) {
-//        for (int j = 0; j < n; j++) {
-//            std::cout << A[i][j] << "  ";
-//        }
-//        std::cout << "\n";
-//    }
+    std::cout<<"Parallel version: \n";
+    std::cout << std::setprecision(precision) << std::fixed;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            std::cout << A[i][j] << "  ";
+        }
+        std::cout << "\n";
+    }
 
 
     return 0;
