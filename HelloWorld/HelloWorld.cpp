@@ -3,7 +3,7 @@
 #include "iostream"
 #include "fstream"
 #include "string"
-#include "Helper.h"
+#include "../Helper.h"
 
 
 int main(void) {

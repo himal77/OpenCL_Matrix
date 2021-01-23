@@ -7,7 +7,7 @@
 
 #include <CL/cl.hpp>
 #include "iostream"
-#include "Helper.h"
+#include "../Helper.h"
 #include "algorithm"
 
 int main() {
