@@ -1,3 +1,9 @@
+/**
+ * Array with OpenCL
+ *
+ * @Author Himal Puri
+ */
+
 
 #include <assert.h>
 #include <CL/cl.hpp>
@@ -5,9 +11,7 @@
 #include "fstream"
 #include "string"
 
-
-
-int main(void) {
+int main() {
     std::vector<cl::Platform> platforms;
     cl::Platform::get(&platforms);
 
@@ -27,18 +31,5 @@ int main(void) {
     cl::Context context(device);
     cl::Program program(context, sources);
 
-    auto err =   program.build("-cl-std=CL1.2");
-
-    char buf[16];
-    cl::Buffer memBuf(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(buf));
-    cl::Kernel kernel(program, "HelloWorld", &err);
-    kernel.setArg(0, memBuf);
-
-    cl::CommandQueue queue(context, device);
-    queue.enqueueTask(kernel);
-    queue.enqueueReadBuffer(memBuf, CL_TRUE, 0, sizeof(buf), buf);
-
-    std::cout<<buf;
-    std::cin.get();
-
+    auto err = program.build("-cl-std=CL1.2");
 }
