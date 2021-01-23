@@ -87,7 +87,7 @@ int main() {
         std::cout << "\n";
     }
     std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
-              << std::endl;
+              <<" microseconds"<< std::endl;
 
 
     /////////////////////////////////////////////////
@@ -114,7 +114,7 @@ int main() {
         }
         std::cout << "\n";
     }
-    std::cout<<"Time taken: "<<std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()<<std::endl;
+    std::cout<<"Time taken: "<<std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()<<<<" microseconds"<<std::endl;
 */
 
     return 0;
