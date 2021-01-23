@@ -8,13 +8,13 @@
 #include "vector"
 #include "string"
 #include "fstream"
-#include <cassert>
+#include "assert.h"
 
 cl::Program createPlatform(const std::string& file) {
     std::vector<cl::Platform> platforms;
     cl::Platform::get(&platforms);
 
-    assert(!platforms.empty());
+    assert(platforms.size() > 0);
 
     auto platform = platforms.front();
     std::vector<cl::Device> devices;

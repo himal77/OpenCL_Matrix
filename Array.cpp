@@ -5,31 +5,51 @@
  */
 
 
-#include <assert.h>
 #include <CL/cl.hpp>
 #include "iostream"
-#include "fstream"
-#include "string"
+#include "Helper.h"
+#include "algorithm"
 
 int main() {
-    std::vector<cl::Platform> platforms;
-    cl::Platform::get(&platforms);
+    cl::Program program = createPlatform("Array.cl");
+    auto context = program.getInfo<CL_PROGRAM_CONTEXT>();
+    auto devices = context.getInfo<CL_CONTEXT_DEVICES>();
+    auto &device = devices.front();
 
-    assert(platforms.size() > 0);
+    std::vector<int> vec(1024);
 
-    auto platform = platforms.front();
-    std::vector<cl::Device> devices;
-    platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+    cl_int err = 0;
+    cl::Buffer inBuf(context, CL_MEM_READ_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_ALLOC_HOST_PTR,
+                     sizeof(int) * vec.size(), vec.data(), &err);
+    cl::Buffer outBuf(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY,
+                      sizeof(int) * vec.size(), &err);
 
-    auto device = devices.front();
+    // declaring the kernel with its method name
+    cl::Kernel kernel(program, "ProcessArray");
 
-    std::ifstream helloWorldFile("HelloWorld.cl");
-    std::string src(std::istreambuf_iterator<char>(helloWorldFile), (std::istreambuf_iterator<char>()));
+    // setting argument for the kernel methods
+    err = kernel.setArg(0, inBuf);
+    err = kernel.setArg(1, outBuf);
 
-    cl::Program::Sources sources(1, std::make_pair(src.c_str(), src.length() + 1));
+    // creating queue command for executing on kernel
+    cl::CommandQueue queue(context, device);
 
-    cl::Context context(device);
-    cl::Program program(context, sources);
+    // Filling the vector
+    err = queue.enqueueFillBuffer(inBuf, 3, sizeof(int) * 10, sizeof(int) * (vec.size() - 10));
 
-    auto err = program.build("-cl-std=CL1.2");
+    // Calling the kernel with range operation
+    err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(vec.size()));
+
+    // reading the data from the kernel
+    err = queue.enqueueReadBuffer(outBuf, CL_FALSE, 0, sizeof(int) * vec.size(), vec.data());
+
+    // waiting for kernel to finish
+    cl::finish();
+
+    std::cout<<"Element of vector is: ";
+
+    std::for_each(vec.begin(), vec.end(), [](int& a){
+        std::cout<<a<<std::endl;
+    });
+
 }
