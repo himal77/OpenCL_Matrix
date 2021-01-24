@@ -18,7 +18,7 @@ cl::Program createPlatform(const std::string& file) {
 
     auto platform = platforms.front();
     std::vector<cl::Device> devices;
-    platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+    platform.getDevices(CL_DEVICE_TYPE_GPU, &devices); // getting GPU to run the execution
 
     auto device = devices.front();
 
