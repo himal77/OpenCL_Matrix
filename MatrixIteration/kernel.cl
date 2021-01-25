@@ -11,10 +11,10 @@ __kernel void gpuMatAdd(__global float *A, __global float *B, int N) {
   int index = i * N + j;
 
   /* four other element for averaging */
-  int left = (index % N) == 0       ? 0: A[index - 1];
-  int top  = (index - N) < 0        ? 0: A[index - N];
-  int right = (index % N) == N-1    ? 0: A[index + 1];
-  int bottom  = (index + N) >= N*N  ? 0: A[index + N];
+  float left    = (index % N) == 0      ? 0: A[index - 1];
+  float top     = (index - N) < 0       ? 0: A[index - N];
+  float right   = (index % N) == N-1    ? 0: A[index + 1];
+  float bottom  = (index + N) >= N*N    ? 0: A[index + N];
 
   /* keeping element in the new matrix */
   B[index] = 0.2 * (A[index] + left + top + right + bottom);
