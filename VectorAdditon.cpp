@@ -1,9 +1,9 @@
 /**
- * Matrix addition with OpenCL
+ * This is the vector additon
+ * C = A + B
  *
  * @Author Himal Puri
  */
-
 
 #include "CL/opencl.h"
 
@@ -12,11 +12,6 @@
 #include <string>
 #include <cstdio>
 #include <iomanip>
-
-#define NUM_ITERATION 3
-#define precision 2
-
-const std::string &file = "kernel.cl";
 
 int getErrorCode(std::string from, int errCode) {
     std::cout << from << errCode << std::endl;
@@ -43,12 +38,12 @@ int main(int argc, char *argv[]) {
 
 
     /**
-     * Initializing 3 matrix A, B, C.
+     * Initializing 3 vector A, B, C.
      * @result from OpenCL C = A+B using OpenCL
      */
     const int N = 4;
-    float *A = (float *) malloc(N * N * sizeof(float));
-    float *B = (float *) malloc(N * N * sizeof(float));
+    float *A = (float *) malloc(N * sizeof(float));
+    float *B = (float *) malloc(N * sizeof(float));
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
@@ -118,24 +113,7 @@ int main(int argc, char *argv[]) {
     size_t localWorkSize[2] = {2, 2};
     size_t globalWorkSize[2] = {N, N};
 
-    std::cout<<"********************Inside loop now*****************+ \n";
-    /**
-     * TODO optimize this loop
-     * Since data movement from host to device is slow, this program is slow
-     *
-     * How to use this function in kernel?
-     *
-     * for(int i = 0; i < NUM_ITERATION, i++){
-     *  Execute the computation here for A
-     *  Put in matrix B
-     *
-     *  global Barrier here / local barrier
-     *
-     *  Put back B  to A.
-     *
-     *  global barrier here / local barrier
-     * }
-     */
+    std::cout<<"********************We are inside loop now*****************+ \n";
     for(int i = 0; i < NUM_ITERATION; i++) {
         err = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, globalWorkSize, localWorkSize, 0, NULL, NULL);
         std::cout << "err at clEnqueueNDRangeKernel(): " << err << std::endl;
