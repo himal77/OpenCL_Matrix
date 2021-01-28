@@ -15,8 +15,8 @@
 #include "random"
 #include "chrono"
 
-#define MATRIX_SIZE 2048
-#define NUM_ITERATION 3
+#define MATRIX_SIZE 4096
+#define ITERATION 20
 #define KERNEL_FILE "kernel.cl"
 
 #define precision 2
@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     /**
      * Initializing 2 matrix A, B.
      */
+    const size_t NUM_ITERATION = ITERATION;
     const size_t N = MATRIX_SIZE;
     float *A = (float *) malloc(N * N * sizeof(float));
     float *B = (float *) malloc(N * N * sizeof(float));
@@ -175,6 +176,7 @@ int main(int argc, char *argv[]) {
     err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &A_dev);
     err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &B_dev);
     err = clSetKernelArg(kernel, 2, sizeof(int), &N);
+    err = clSetKernelArg(kernel, 3, sizeof(int), &NUM_ITERATION);
     getErrorCode("err at clSetKernelArg(): ", err);
 
     /**
@@ -208,27 +210,16 @@ int main(int argc, char *argv[]) {
      * }
      */
     start = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < NUM_ITERATION; i++) {
-        err = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, globalWorkSize, NULL, 0, NULL, NULL);
-        getErrorCode("err at clEnqueueNDRangeKernel(): ", err);
 
-        /* Reading from the queue for B */
-        err = clEnqueueReadBuffer(queue, B_dev, CL_TRUE, 0, N * N * sizeof(float), B, 0, NULL, NULL);
-        getErrorCode("err at clEnqueueReadBuffer(): ", err);
+    err = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, globalWorkSize, NULL, 0, NULL, NULL);
+    getErrorCode("err at clEnqueueNDRangeKernel(): ", err);
 
-        clFinish(queue);
-        clFlush(queue);
+    /* Reading from the queue for B */
+    err = clEnqueueReadBuffer(queue, B_dev, CL_TRUE, 0, N * N * sizeof(float), B, 0, NULL, NULL);
+    getErrorCode("err at clEnqueueReadBuffer(): ", err);
 
+    clFinish(queue);
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                A[i * N + j] = B[i * N + j];
-            }
-        }
-
-        err = clEnqueueWriteBuffer(queue, A_dev, CL_TRUE, 0, N * N * sizeof(float), A, 0, NULL, NULL);
-        getErrorCode("err at clEnqueueWriteBuffer(): ", err);
-    }
     end = std::chrono::high_resolution_clock::now();
     auto parallelTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
@@ -247,7 +238,7 @@ int main(int argc, char *argv[]) {
         std::cout << std::setprecision(precision) << std::fixed;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                std::cout << C[i * N + j] << "  ";
+                std::cout << C[i * N + j] << " ";
             }
             std::cout << "\n";
         }

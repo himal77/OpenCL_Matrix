@@ -1,5 +1,6 @@
-__kernel void gpuMatAdd(__global float *A, __global float *B, int N) {
+__kernel void gpuMatAdd(__global float *A, __global float *B, int N, int NUM_ITERATION) {
 
+for(int k = 0; k < NUM_ITERATION; k++) {
   /* Work item */
   int i = get_global_id(0);
   int j = get_global_id(1);
@@ -18,5 +19,10 @@ __kernel void gpuMatAdd(__global float *A, __global float *B, int N) {
 
   /* keeping element in the new matrix */
   B[index] = 0.2 * (A[index] + left + top + right + bottom);
+  barrier(CLK_GLOBAL_MEM_FENCE);
 
+  A[index] = B[index];
+  barrier(CLK_GLOBAL_MEM_FENCE);
+ }
+ return;
 }
