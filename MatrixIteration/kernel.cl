@@ -5,6 +5,9 @@ for(int k = 0; k < NUM_ITERATION; k++) {
   int i = get_global_id(0);
   int j = get_global_id(1);
 
+  int a = get_local_id(0);
+  int b = get_local_id(1);
+
   /* Return if thread out of boundary */
   if (i>=N && j>=N) return;
 
@@ -21,8 +24,20 @@ for(int k = 0; k < NUM_ITERATION; k++) {
   B[index] = 0.2 * (A[index] + left + top + right + bottom);
   barrier(CLK_GLOBAL_MEM_FENCE);
 
-  A[index] = B[index];
+  A[a * N + b] = B[a * N +b];
+  barrier(CLK_LOCAL_MEM_FENCE);
   barrier(CLK_GLOBAL_MEM_FENCE);
  }
  return;
 }
+
+/**
+  float left    = (index % N) == 0      ? 0: A[index - 1];
+  float top     = (index - N) < 0       ? 0: A[index - N];
+  float right   = (index % N) == N-1    ? 0: A[index + 1];
+  float bottom  = (index + N) >= N*N    ? 0: A[index + N];
+
+  /* keeping element in the new matrix */
+  B[index] = 0.2 * (A[index] + left + top + right + bottom);
+  barrier(CLK_GLOBAL_MEM_FENCE);
+*/
