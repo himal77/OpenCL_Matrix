@@ -16,7 +16,7 @@
 #include "chrono"
 
 #define MATRIX_SIZE 8
-#define ITERATION 2
+#define ITERATION 1
 #define KERNEL_FILE "kernel.cl"
 
 

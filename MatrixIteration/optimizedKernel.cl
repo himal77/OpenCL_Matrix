@@ -30,16 +30,8 @@ for(int k = 0; k < NUM_ITERATION; k++) {
   /* Copying element from global address to local address */
    localA[localIndex] = A[globalIndex];
 
-
-   if(localIndex == 2) {
-        if(groupIdXSide == 0 && groupIdYSide == 1) {
-            printf(" %f ", localA[localIndex]);
-        }
-   }
-
   barrier(CLK_LOCAL_MEM_FENCE);
   barrier(CLK_GLOBAL_MEM_FENCE);
-
 
    /**
      * Copying from the local memory and average the border element.
@@ -53,14 +45,47 @@ for(int k = 0; k < NUM_ITERATION; k++) {
     float bottom  = 0;
   if (groupIdXSide == 0 || groupIdYSide == 0 || groupIdXSide == globalDim / localDim - 1 || groupIdYSide == globalDim / localDim - 1) {
 
+        /* If the group is from the top line */
+        if(groupIdXSide == 0) {
+
+             /** if the matrix is top left corner
+              *  else if the matrix is from top right corner
+              *  else the matrix is from pure top line
+              */
+
+            if (groupIdYSide == 0) {
+                printf("How many times? ");
+            } else if (groupIdYSide == globalDim / localDim - 1 ) {
+
+            } else {
+
+            }
+        }
+
+        /* if the group is left */
+        if(groupIdYSide == 0) {
+
+        }
+
+        /* if the group is from bottom line of global matrix */
+        if(groupIdXSide == globalDim / localDim - 1) {
+
+        }
+
+        /* if the group is from the right line */
+        if(groupIdYSide == globalDim / localDim - 1) {
+
+        }
+
   } else {
+
     left =    (localIndex % localDim) == 0                    ? A[globalIndex - 1] : localA[localIndex - 1];
     top  =    (localIndex - localDim) < 0                     ? A[globalIndex - N] : localA[localIndex - localDim];
-    right =   (localIndex % localDim) == N-1                  ? A[globalIndex + 1] : localA[localIndex - 1];
+    right =   (localIndex % localDim) == localDim-1           ? A[globalIndex + 1] : localA[localIndex + 1];
     bottom =  (localIndex + localDim) >= localDim*localDim    ? A[globalIndex + N] : localA[localIndex + localDim];
 
     /* Copying in localB to store */
-    localB[localIndex] = localA[localIndex];
+    localB[localIndex] = 0.2 * (left + right + top + bottom + localA[localIndex]);
   }
 
   /* waiting for local and global elements to finish */
