@@ -1,5 +1,5 @@
 /**
- * Matrix addition with OpenCL
+ * Matrix Iteration with OpenCL
  *
  * @Author Himal Puri
  */
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
     std::string src(std::istreambuf_iterator<char>(openCLFile), (std::istreambuf_iterator<char>()));
     cl_program program = clCreateProgramWithSource(context, 1, (const char **) &src, NULL, NULL);
     err = clBuildProgram(program, 0, NULL, "-cl-single-precision-constant", NULL, NULL);
-    cl_kernel kernel = clCreateKernel(program, "gpuMatAdd", &err);
+    cl_kernel kernel = clCreateKernel(program, "matIteration", &err);
     getErrorCode("err at clBuildProgram(): ", err);
 
 
