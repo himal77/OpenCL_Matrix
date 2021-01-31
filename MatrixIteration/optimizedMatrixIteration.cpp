@@ -15,11 +15,10 @@
 #include "random"
 #include "chrono"
 
-#define MATRIX_SIZE 8
-#define ITERATION 1
+#define MATRIX_SIZE 4096
+const size_t GROUP_SIZE = 32;
+#define ITERATION 2
 #define KERNEL_FILE "kernel.cl"
-
-
 #define precision 2
 
 void getErrorCode(std::string from, int errCode) {
@@ -48,9 +47,9 @@ int main(int argc, char *argv[]) {
     /*
      * Declearing the matrix for local in kernel.
      */
-    const size_t localSize = 2;
-    float *localA = (float *) malloc(localSize * localSize * sizeof(float));
-    float *localB = (float *) malloc(localSize * localSize * sizeof(float));
+
+    float *localA = (float *) malloc(GROUP_SIZE * GROUP_SIZE * sizeof(float));
+    float *localB = (float *) malloc(GROUP_SIZE * GROUP_SIZE * sizeof(float));
 
     /**
      * @if size is four.
@@ -65,10 +64,6 @@ int main(int argc, char *argv[]) {
             for (int j = 0; j < N; j++) {
                 if ((i * N + j) == 6) {
                     A[i * N + j] = C[i * N + j] = 10.0f;
-                } else if ((i * N + j) == 4) {
-                    A[i * N + j] = C[i * N + j] = 5.0f;
-                } else if ((i * N + j) == 12) {
-                    A[i * N + j] = C[i * N + j] = 15.0f;
                 } else {
                     A[i * N + j] = C[i * N + j] = 0.0f;
                 }
@@ -83,17 +78,6 @@ int main(int argc, char *argv[]) {
     }
 
 
-    /**
-     * Printing A for testing
-     */
-    std::cout << " Original A version: \n";
-    std::cout << std::setprecision(precision) << std::fixed;
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            std::cout << A[N * i + j] << " ";
-        }
-        std::cout << "\n";
-    }
 
 
     /////////////////////////////////////////////////
@@ -206,8 +190,8 @@ int main(int argc, char *argv[]) {
     err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &B_dev);
     err = clSetKernelArg(kernel, 2, sizeof(int), &N);
     err = clSetKernelArg(kernel, 3, sizeof(int), &NUM_ITERATION);
-    err = clSetKernelArg(kernel, 4, localSize * localSize * sizeof(cl_float), NULL);
-    err = clSetKernelArg(kernel, 5, localSize * localSize * sizeof(cl_float), NULL);
+    err = clSetKernelArg(kernel, 4, GROUP_SIZE * GROUP_SIZE * sizeof(cl_float), NULL);
+    err = clSetKernelArg(kernel, 5, GROUP_SIZE * GROUP_SIZE * sizeof(cl_float), NULL);
     getErrorCode("err at clSetKernelArg(): ", err);
 
     /**
@@ -216,14 +200,7 @@ int main(int argc, char *argv[]) {
      * @workgroup global size
      * @ndrange global work offset
      */
-    size_t localWorkSize[2];
-    if (N <= 32) {
-        localWorkSize[0] = localSize;
-        localWorkSize[1] = localSize;
-    } else {
-        localWorkSize[0] = localSize;
-        localWorkSize[1] = localSize;
-    }
+    size_t localWorkSize[2] = {GROUP_SIZE, GROUP_SIZE};
     size_t globalWorkSize[2] = {N, N};
 
     /**
@@ -263,7 +240,7 @@ int main(int argc, char *argv[]) {
     /////////////////////////////////////////////////
 
 
-    if (N < 9) {
+    if (N < 90) {
         /**
          * displaying matrix in serial version
          * As well as the time it takes to compute
