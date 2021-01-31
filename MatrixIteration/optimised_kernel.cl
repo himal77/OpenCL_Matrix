@@ -48,7 +48,7 @@ for(int k = 0; k < NUM_ITERATION; k++) {
         if(groupIdYSide == 0) {  // if item is top left corner
             left =    (localIndex % localSize) == 0                    ? 0.0 : localA[localIndex - 1];
             top  =    (localIndex - localSize) < 0                     ? 0.0 : localA[localIndex - localSize];
-
+            
             if(localSize == N) { // if it has only one work group
                 printf("LocalSize: %d, globalDim: %d\n", localSize, localDim);
                  right =   (localIndex % localSize) == localSize-1           ? 0.0 : localA[localIndex + 1];

@@ -1,4 +1,4 @@
-__kernel void gpuMatAdd(__global float *A, __global float *B, int N, int NUM_ITERATION) {
+__kernel void gpuMatAdd(__global float *A, __global float *B, int N, int NUM_ITERATION, __local float *localA, __local float *localB) {
 
 for(int k = 0; k < NUM_ITERATION; k++) {
   /* Work item */
@@ -24,7 +24,7 @@ for(int k = 0; k < NUM_ITERATION; k++) {
   B[index] = 0.2 * (A[index] + left + top + right + bottom);
   barrier(CLK_GLOBAL_MEM_FENCE);
 
-  A[a * N + b] = B[a * N +b];
+  A[index] = B[index];
   barrier(CLK_GLOBAL_MEM_FENCE);
  }
  return;
